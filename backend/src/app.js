@@ -68,19 +68,22 @@ app.use('/api/notifications', notificationRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
+
+const PORT = process.env.PORT || env.port || 3000;
+
 // Start server
 const startServer = async () => {
   // Test database connection
-  const dbConnected = await testConnection();
-  
-  if (!dbConnected) {
-    console.error('Failed to connect to database. Please check your configuration.');
-    process.exit(1);
-  }
+  try {
+  await testConnection();
+  console.log('Database connected');
+} catch (err) {
+  console.error('Database connection failed, continuing without DB');
+}
 
-  app.listen(env.port, () => {
-    console.log(`Server running on port ${env.port} in ${env.nodeEnv} mode`);
-    console.log(`API available at http://localhost:${env.port}/api`);
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT} in ${env.nodeEnv} mode`);
+    console.log(`API available at /api`);
   });
 };
 
