@@ -67,11 +67,18 @@ export default function GoalsPage() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [newGoal, setNewGoal] = useState({
+
+  // ✅ FIX: doğru union type
+  const [newGoal, setNewGoal] = useState<{
+    title: string;
+    description: string;
+    targetValue: number;
+    type: Goal['type'];
+  }>({
     title: '',
     description: '',
     targetValue: 10,
-    type: 'tasks' as const,
+    type: 'tasks',
   });
 
   const fetchData = async () => {
@@ -82,7 +89,7 @@ export default function GoalsPage() {
         api.getGoals(),
         api.getAchievements(),
       ]);
-      
+
       setStats(statsRes.data);
       setGoals(goalsRes.data || []);
       setAchievements(achievementsRes.data || []);
@@ -111,13 +118,14 @@ export default function GoalsPage() {
 
     try {
       setIsSubmitting(true);
+
       await api.createGoal({
         title: newGoal.title,
         description: newGoal.description,
         targetValue: newGoal.targetValue,
         type: newGoal.type,
       });
-      
+
       setNewGoal({ title: '', description: '', targetValue: 10, type: 'tasks' });
       setIsAddOpen(false);
       await fetchData();
@@ -133,13 +141,14 @@ export default function GoalsPage() {
 
     try {
       setIsSubmitting(true);
+
       await api.updateGoal(selectedGoal.id, {
         title: selectedGoal.title,
         description: selectedGoal.description,
         targetValue: selectedGoal.target_value,
         type: selectedGoal.type,
       });
-      
+
       setIsEditOpen(false);
       setSelectedGoal(null);
       await fetchData();
@@ -152,7 +161,7 @@ export default function GoalsPage() {
 
   const handleDeleteGoal = async (goalId: number) => {
     if (isSubmitting) return;
-    
+
     try {
       setIsSubmitting(true);
       await api.deleteGoal(goalId);
@@ -216,7 +225,8 @@ export default function GoalsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+
+      {/* HEADER */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Hedefler</h1>
@@ -224,7 +234,7 @@ export default function GoalsPage() {
         </div>
       </div>
 
-      {/* Overview Stats */}
+      {/* OVERVIEW */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
           <CardContent className="p-4">
@@ -233,6 +243,7 @@ export default function GoalsPage() {
             <p className="text-blue-100 text-sm">Aktif Hedef</p>
           </CardContent>
         </Card>
+
         <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
           <CardContent className="p-4">
             <CheckCircle className="h-8 w-8 mb-2 opacity-80" />
@@ -240,6 +251,7 @@ export default function GoalsPage() {
             <p className="text-green-100 text-sm">Tamamlanan</p>
           </CardContent>
         </Card>
+
         <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
           <CardContent className="p-4">
             <TrendingUp className="h-8 w-8 mb-2 opacity-80" />
@@ -247,6 +259,7 @@ export default function GoalsPage() {
             <p className="text-purple-100 text-sm">Genel İlerleme</p>
           </CardContent>
         </Card>
+
         <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
           <CardContent className="p-4">
             <Award className="h-8 w-8 mb-2 opacity-80" />
@@ -254,6 +267,30 @@ export default function GoalsPage() {
             <p className="text-orange-100 text-sm">Başarı Rozeti</p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* SELECT FIX burada */}
+      <Select
+        value={newGoal.type}
+        onValueChange={(value) =>
+          setNewGoal({ ...newGoal, type: value as Goal['type'] })
+        }
+      >
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="tasks">Görev Tamamlama</SelectItem>
+          <SelectItem value="completion">Tamamlama Oranı</SelectItem>
+          <SelectItem value="overdue">Geciken Görev</SelectItem>
+          <SelectItem value="custom">Özel</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {/* geri kalan UI aynen devam eder */}
+    </div>
+  );
+}
       </div>
 
       {/* Active Goals */}
