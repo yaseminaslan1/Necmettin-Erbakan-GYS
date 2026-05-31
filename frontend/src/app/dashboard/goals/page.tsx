@@ -68,7 +68,6 @@ export default function GoalsPage() {
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ✅ FIX: doğru union type
   const [newGoal, setNewGoal] = useState<{
     title: string;
     description: string;
@@ -118,7 +117,6 @@ export default function GoalsPage() {
 
     try {
       setIsSubmitting(true);
-
       await api.createGoal({
         title: newGoal.title,
         description: newGoal.description,
@@ -141,7 +139,6 @@ export default function GoalsPage() {
 
     try {
       setIsSubmitting(true);
-
       await api.updateGoal(selectedGoal.id, {
         title: selectedGoal.title,
         description: selectedGoal.description,
@@ -225,7 +222,6 @@ export default function GoalsPage() {
 
   return (
     <div className="space-y-6">
-
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <div>
@@ -267,30 +263,6 @@ export default function GoalsPage() {
             <p className="text-orange-100 text-sm">Başarı Rozeti</p>
           </CardContent>
         </Card>
-      </div>
-
-      {/* SELECT FIX burada */}
-      <Select
-        value={newGoal.type}
-        onValueChange={(value) =>
-          setNewGoal({ ...newGoal, type: value as Goal['type'] })
-        }
-      >
-        <SelectTrigger>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="tasks">Görev Tamamlama</SelectItem>
-          <SelectItem value="completion">Tamamlama Oranı</SelectItem>
-          <SelectItem value="overdue">Geciken Görev</SelectItem>
-          <SelectItem value="custom">Özel</SelectItem>
-        </SelectContent>
-      </Select>
-
-      {/* geri kalan UI aynen devam eder */}
-    </div>
-  );
-}
       </div>
 
       {/* Active Goals */}
@@ -412,7 +384,6 @@ export default function GoalsPage() {
                   </p>
                   <p className="text-xs text-gray-500 mt-1">{achievement.description}</p>
                   
-                  {/* Progress bar for unearned achievements */}
                   {!achievement.earned && (
                     <div className="mt-2">
                       <Progress value={achievement.progress} className="h-1" />
@@ -463,7 +434,7 @@ export default function GoalsPage() {
               <Label>Hedef Türü</Label>
               <Select
                 value={newGoal.type}
-                onValueChange={(value: any) => setNewGoal({ ...newGoal, type: value })}
+                onValueChange={(value) => setNewGoal({ ...newGoal, type: value as Goal['type'] })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -485,10 +456,10 @@ export default function GoalsPage() {
                 min={0}
               />
               <p className="text-xs text-gray-500">
-                {newGoal.type === 'tasks' && 'Bu ay tamamlanması gereken görev sayısı'}
-                {newGoal.type === 'completion' && 'Hedeflenen tamamlama yüzdesi'}
-                {newGoal.type === 'overdue' && 'Maksimum geciken görev sayısı (0 = hiç gecikme olmamalı)'}
-                {newGoal.type === 'custom' && 'Özel hedef değeri'}
+                {(newGoal.type as any) === 'tasks' && 'Bu ay tamamlanması gereken görev sayısı'}
+                {(newGoal.type as any) === 'completion' && 'Hedeflenen tamamlama yüzdesi'}
+                {(newGoal.type as any) === 'overdue' && 'Maksimum geciken görev sayısı (0 = hiç gecikme olmamalı)'}
+                {(newGoal.type as any) === 'custom' && 'Özel hedef değeri'}
               </p>
             </div>
           </div>
@@ -530,7 +501,7 @@ export default function GoalsPage() {
                 <Label>Hedef Türü</Label>
                 <Select
                   value={selectedGoal.type}
-                  onValueChange={(value: any) => setSelectedGoal({ ...selectedGoal, type: value })}
+                  onValueChange={(value) => setSelectedGoal({ ...selectedGoal, type: value as Goal['type'] })}
                 >
                   <SelectTrigger>
                     <SelectValue />
